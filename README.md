@@ -18,6 +18,10 @@ Projects/
 Ideas/            One note per idea, created from Templates/Idea.md when an
                   idea earns its own write-up (promoted from an Idea Block).
 Templates/        Templater + Excalidraw templates — see "Blocks" below.
+                  Naming convention: *Template files* (spawn a whole new note)
+                  end in "Template"; *Block files* (insert into a note you're
+                  already in) end in "Block". Keeps the Templater picker
+                  unambiguous.
 Attachments/      Images, PDFs, anything dragged or pasted into a note.
 ```
 
@@ -25,19 +29,29 @@ Attachments/      Images, PDFs, anything dragged or pasted into a note.
 
 The daily note is just frontmatter + a date heading. Content comes from
 inserting one of these, cursor wherever you want it, via Command Palette →
-**Templater: Insert Template**:
+**Templater: Open insert template modal** (not "Create new note from
+template" — that one spawns a whole separate file/tab instead of inserting
+inline):
 
 | Block | Use for |
 |---|---|
 | `Meeting Block.md` | Header, time, attendees, notes for one meeting |
 | `Notes Block.md` | Lightweight timestamped bullet, no meeting header needed |
-| `Idea Block.md` | Quick inline idea capture; promote to `Ideas/` later if it has legs |
+| `Idea Block.md` | Quick inline idea capture; promote to `Ideas/` later if it has legs (via `Idea Template.md`, not this one — see below) |
 | `Followup Block.md` | A single open-thread checkbox item |
-| `Diagram Block.md` | Prompts for a title, creates a new Excalidraw drawing in `Diagrams/` from the generic template, embeds it at the cursor |
+| `Diagram Block.md` | Prompts for a title, creates a new Excalidraw drawing in `Diagrams/` from `Meeting Diagram Template.excalidraw.md`, embeds it at the cursor |
 | `Photo Block.md` | Caption placeholder — use the mobile toolbar's camera/gallery icon to insert the actual image below it |
 
 Bring in as many of each as the session needs — a meeting with three
 diagrams and two follow-ups is six inserts, not six different note files.
+
+Two separate template files spawn whole new notes instead (use Command
+Palette → **Templater: Create new note from template** for these):
+
+| Template | Use for |
+|---|---|
+| `Daily Note Template.md` | Used automatically by core Daily Notes — you shouldn't need to invoke this one manually |
+| `Idea Template.md` | A full write-up when an idea (captured via Idea Block) earns its own note in `Ideas/` |
 
 ## One-time setup (do this in Obsidian, in order)
 
@@ -49,13 +63,13 @@ diagrams and two follow-ups is six inserts, not six different note files.
 3. **Configure Daily notes** (Settings → Daily notes):
    - Date format: `YYYY-MM-DD`
    - New file location: `Daily`
-   - Template file location: `Templates/Daily Note.md`
+   - Template file location: `Templates/Daily Note Template.md`
 4. **Configure Templater** (Settings → Templater):
    - Template folder location: `Templates`
    - Trigger Templater on new file creation: **on**
 5. **Configure Excalidraw** (Settings → Excalidraw):
    - Use Excalidraw folder: **on** → `Diagrams`
-   - Template for new drawings: `Templates/Meeting Diagram.excalidraw.md`
+   - Template for new drawings: `Templates/Meeting Diagram Template.excalidraw.md`
 
 ## Git hygiene — read before syncing across devices
 

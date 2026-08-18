@@ -8,7 +8,7 @@ ea.reset();
 await ea.create({
 	filename: title,
 	foldername: "Diagrams",
-	templatePath: "Templates/Meeting Diagram.excalidraw.md",
+	templatePath: "Templates/Meeting Diagram Template.excalidraw.md",
 	onNewPane: true
 });
 tR = "**Diagram:** ![[Diagrams/" + title + ".md]]";
