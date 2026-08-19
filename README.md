@@ -4,14 +4,14 @@ Daily-note-driven vault for meeting capture + inline diagramming. Each daily
 note starts **blank except the date** — content comes from pulling in
 **blocks**, on demand, as a session unfolds. Multiple meetings, ideas, and
 follow-ups all live inside one day's note, each contained in its own
-**callout**, rather than spinning off into separate files.
+**callout**, rather than spinning off into separate files. Everything is
+found later through **tags**, not folders — see the rule below before
+adding any new folder to this vault.
 
 ## Folder structure
 
 ```
 Daily/            One note per calendar day, created bare from the date template.
-Meetings/         Index notes — one per recurring meeting (e.g. "Praelexis Standup").
-                  Not raw content: they link OUT to the daily notes that discussed them.
 Diagrams/         All Excalidraw drawings live here, one file per diagram.
 Projects/
   NorthStar/
@@ -26,18 +26,44 @@ Templates/        Templater + Excalidraw templates — see "Blocks" and
 Attachments/      Images, PDFs, anything dragged or pasted into a note.
 ```
 
+## The rule for adding a new folder
+
+A folder is only justified for one of two reasons:
+
+1. **The content isn't a record of a particular day** — it's a persistent
+   artifact, read and edited across many days regardless of when it was
+   created (a project's accumulated knowledge, an idea promoted into its
+   own note).
+2. **A plugin technically requires a separate file** — Excalidraw canvases
+   and pasted images can't live inline as markdown text; Obsidian has to
+   store them separately no matter how you'd prefer to organize.
+
+Anything that is fundamentally "what happened on this day" — a meeting, an
+idea as it's first captured, a follow-up — stays **inside** the daily note
+and gets found later purely through **tags**. It never gets its own folder
+or its own index note, even if it repeats every week. (This vault used to
+have a `Meetings/` folder with one index note per recurring meeting — that
+broke this rule, since a recurring meeting is an event, not a persistent
+artifact. It's been replaced by the series tag below.)
+
+| Folder | Why it survives the rule |
+|---|---|
+| `Daily/` | It IS the day — the spine everything else hangs off |
+| `Diagrams/` | Rule 2 — Excalidraw can't inline a canvas |
+| `Attachments/` | Rule 2 — Obsidian can't inline a binary file |
+| `Projects/` | Rule 1 — accumulated knowledge, not tied to one day |
+| `Ideas/` | Rule 1 — same logic as Projects, once an idea is promoted |
+
 ## The organizing rule: folders / tags / links each do one job
 
-- **Folders** — broad separation (this list above). Rarely change.
-- **Tags** — mark **type** or **state**, never topic or person. `#meeting/1-1`
-  says *what kind* of meeting; `#followup/open` says *what state* a task is
-  in. "Who owns this" is a field (`**Owner:**`), not a tag. "What project is
-  this about" is a `[[link]]` to that project's note, not a tag. This keeps
-  the tag list from growing into one tag per person or per project as the
-  team grows.
-- **Links** — connection and context. The `[[Meetings/...]]` backlink from a
-  meeting callout to its recurring-meeting index note is this vault's one
-  deliberate link pattern — keep using it rather than replacing it with tags.
+- **Folders** — broad separation, governed by the rule above. Rarely change.
+- **Tags** — mark **type**, **state**, or **which recurring series** — never
+  topic or person. `#meeting/1-1` says *what kind*; `#meeting/praelexis-standup`
+  says *which recurring series*; `#followup/open` says *what state*. "Who
+  owns this" is a field (`**Owner:**`), not a tag. "What project is this
+  about" is a `[[link]]` to that project's note, not a tag.
+- **Links** — connection and context, used sparingly (e.g. linking a
+  promoted Idea Block to its full note in `Ideas/`).
 
 ## Callouts
 
@@ -48,7 +74,7 @@ embed or a captioned image doesn't need a box around it.
 
 | Callout | Syntax | Contains | Default state |
 |---|---|---|---|
-| `meeting` | `> [!meeting]+ Name #meeting/<type>` | Time, Attendees, linked meeting index, Notes | Expanded — you're actively in it |
+| `meeting` | `> [!meeting]+ Name #meeting/<type> #meeting/<series>` | Time, Attendees, Notes | Expanded — you're actively in it |
 | `followup` | `> [!followup]+ #followup/open` | Owner, Due, one checkbox task | Expanded while open; collapse once closed |
 | `idea` | `> [!idea]+ #idea/raw` | Free-text bullet(s) | Expanded |
 
@@ -63,9 +89,18 @@ embed or a captioned image doesn't need a box around it.
 #meeting/1-1                     — one-on-ones
 #meeting/external                — vendor / partner / customer-facing
 ```
-Add new types by editing the `types` list at the top of `Meeting Block.md` —
-the Templater prompt reads from that list, so new meeting types show up in
-the picker without hunting for exact tag spelling later.
+Add new types by editing the `types` array at the top of `Meeting Block.md`.
+
+**Meeting series** — which specific recurring meeting, independent of type.
+A meeting can carry both a type tag and a series tag at once (e.g. Praelexis
+Standup is both `#meeting/team` and `#meeting/praelexis-standup`):
+```
+#meeting/praelexis-standup
+```
+Add new series by editing the `series` array in `Meeting Block.md` — the
+tag is generated automatically from the name you add (lowercased, spaces
+become hyphens), so you never type the tag by hand. Picking "One-off / no
+series" skips the series tag and just asks for a free-text meeting name.
 
 **Followup state:**
 ```
@@ -86,11 +121,14 @@ the picker without hunting for exact tag spelling later.
 
 Cursor where you want it → Command Palette → **"Templater: Open insert
 template modal"** (not "Create new note from template" — that one spawns a
-separate file/tab instead of inserting inline):
+separate file/tab instead of inserting inline). This is the command
+confirmed working end-to-end — including the multi-step prompts in Meeting
+and Diagram blocks, which fire as a sequence of pop-ups from this same
+command, one after another.
 
 | Block | Use for |
 |---|---|
-| `Meeting Block.md` | Prompts for meeting type + name, inserts a `[!meeting]` callout |
+| `Meeting Block.md` | Prompts for meeting type, then series (or a free-text name for one-offs); inserts a `[!meeting]` callout with both tags |
 | `Notes Block.md` | Lightweight timestamped bullet, no callout, no meeting header needed |
 | `Idea Block.md` | Inserts a `[!idea]` callout; promote to `Ideas/` later if it develops |
 | `Followup Block.md` | Inserts a `[!followup]` callout with owner/due/checkbox |
@@ -145,9 +183,11 @@ git push
 1. Open today's daily note — blank except the date heading.
 2. Insert whatever blocks the moment calls for — a meeting, a followup, an
    idea, a diagram, a photo — in any order, as many times as needed.
-3. If a meeting recurs, add a line to its index note in `Meetings/` linking
-   back to today's daily note.
-4. Promote an idea that has legs into a full note via `Idea Template.md`.
+3. Promote an idea that has legs into a full note via `Idea Template.md`.
+
+There's no manual linking step for recurring meetings anymore — the series
+tag does that automatically. Nothing to remember to update after a meeting
+ends.
 
 ## Worked example — one day, three meetings, a followup, an idea
 
@@ -157,7 +197,6 @@ git push
 > [!meeting]+ Sprint Planning #meeting/sprint-planning
 > **Time:** 09:00
 > **Attendees:**
-> **Linked meeting index:** [[Meetings/]]
 >
 > **Notes:**
 > -
@@ -167,10 +206,9 @@ git push
 > **Due:** 2026-08-22
 > - [ ] Confirm churn model retraining cadence
 
-> [!meeting]+ Praelexis Standup #meeting/team
+> [!meeting]+ Praelexis Standup #meeting/team #meeting/praelexis-standup
 > **Time:** 11:00
 > **Attendees:**
-> **Linked meeting index:** [[Meetings/Praelexis Standup]]
 >
 > **Notes:**
 > -
@@ -181,7 +219,6 @@ git push
 > [!meeting]+ Vendor Check-in — QContact #meeting/external
 > **Time:** 15:00
 > **Attendees:**
-> **Linked meeting index:** [[Meetings/]]
 >
 > **Notes:**
 > -
@@ -193,14 +230,12 @@ git push
 |---|---|
 | `#meeting` | Every meeting, any type, across every day |
 | `#meeting/1-1` | Just your one-on-ones |
+| `#meeting/praelexis-standup` | Every Praelexis Standup, in order, full context — no index note needed |
 | `#followup/open` | Every open action item, across every day |
 | `#followup/open "Owner: Thabo"` | Everything open that Thabo owes you |
 | `#idea/raw` | Every idea not yet triaged |
 
 ## Notes
 
-- `Meetings/Praelexis Standup.md` is a worked example of the index pattern —
-  copy it for other recurring meetings, then delete it once you've got a few
-  real ones.
 - `Meeting Diagram Template.excalidraw.md` is intentionally generic (3 boxes
   + connectors) — a starting layout, not a fixed diagram type.
