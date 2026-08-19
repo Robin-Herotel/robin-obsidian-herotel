@@ -1,6 +1,8 @@
 <%*
-// Value tags — add new ones here as needed, keep "Done" last in the list.
-const values = ["revenue-protect", "revenue-growth", "revenue-expand", "customer-experience", "cost-reduction", "Done - no more tags"];
+// Value tags — commercial framing (revenue-*, customer-experience) plus
+// QCDSM (Quality, Cost, Delivery, Safety, Morale) operational framing.
+// Add new ones here as needed, keep "Done" last in the list.
+const values = ["revenue-protect", "revenue-growth", "revenue-expand", "customer-experience", "cost-reduction", "quality", "delivery", "safety", "morale", "Done - no more tags"];
 let chosen = [];
 while (true) {
 	const pick = await tp.system.suggester(values, values, false, "Add a value tag (pick Done to finish)");

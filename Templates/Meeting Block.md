@@ -5,9 +5,10 @@ const types = ["standup", "sprint-planning", "retro", "1-1", "workshop", "proble
 const type = await tp.system.suggester(types, types, false, "Ceremony type?");
 
 // Counterparty — WHO the meeting is with, nothing about format.
-// BS-Support / BS-Dev map to the real HR "Support" / "Systems Development"
-// functions under Business Systems. Add new ones here as needed.
-const counterparties = ["general", "D&A", "SDI", "BS-Support", "BS-Dev", "Praelexis", "external"];
+// BS-Support / BS-Dev / Business-Systems / Digital-Innovation / IT /
+// Infrastructure map to real HR functions under Information Systems.
+// Add new ones here as needed.
+const counterparties = ["general", "D&A", "SDI", "BS-Support", "BS-Dev", "Business-Systems", "Digital-Innovation", "IT", "Infrastructure", "Praelexis", "Commercial", "Networks", "Finance", "Customer-Support", "HR", "external"];
 const counterparty = await tp.system.suggester(counterparties, counterparties, false, "Counterparty?");
 
 const title = await tp.system.prompt("Meeting name?", "");

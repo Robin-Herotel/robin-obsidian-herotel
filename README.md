@@ -59,7 +59,8 @@ artifact. It's been replaced by ceremony-type and counterparty tags below.)
 - **Folders** — broad separation, governed by the rule above. Rarely change.
 - **Tags** — mark **type**, **state**, or **who a meeting's with** — never
   topic or person. `#meeting/1-1` says *what kind*; `#meeting/bs-dev`
-  says *who it's with*; `#followup/open` says *what state*. "Who
+  says *who it's with*; `#todo` marks an action item (done = the checkbox,
+  not a tag). "Who
   owns this" is a field (`**Owner:**`), not a tag. "What project is this
   about" is a `[[link]]` to that project's note, not a tag.
 - **Links** — connection and context, used sparingly (e.g. linking a
@@ -75,8 +76,8 @@ embed or a captioned image doesn't need a box around it.
 | Callout | Syntax | Contains | Default state |
 |---|---|---|---|
 | `meeting` | `> [!meeting]+ Name #meeting/<type> #meeting/<counterparty>` | Time, Attendees, Notes | Expanded — you're actively in it |
-| `followup` | `> [!followup]+ #followup/open` | Owner, Due, one checkbox task | Expanded while open; collapse once closed |
-| `idea` | `> [!idea]+ #idea/raw` | Free-text bullet(s) | Expanded |
+| `todo` | `> [!todo]+ #todo` | Owner, Due, one checkbox task | Expanded; checking the box marks it done — no tag to flip |
+| `idea` | `> [!idea]+ #idea` | Free-text bullet(s) | Expanded |
 | `outcome` | `> [!outcome]+ Name #value/<tag> [#value/<tag> ...]` | Linked project, Details | Expanded — for reviewing what shipped |
 
 ## Tag taxonomy
@@ -101,11 +102,20 @@ in it). Parent `#meeting` catches all; narrow with a subtype:
 format). Independent of ceremony type — a meeting carries both:
 ```
 #meeting/general
-#meeting/d-a            — Data & Analytics
+#meeting/d-a               — Data & Analytics
 #meeting/sdi
-#meeting/bs-support      — maps to the real HR "Support" function
-#meeting/bs-dev          — maps to the real HR "Systems Development" function
+#meeting/bs-support         — maps to the real HR "Support" function
+#meeting/bs-dev             — maps to the real HR "Systems Development" function
+#meeting/business-systems   — the core Business Systems function itself
+#meeting/digital-innovation
+#meeting/it                 — Information Technology
+#meeting/infrastructure
 #meeting/praelexis
+#meeting/commercial         — real HR department: Sales, Product, Customer Experience
+#meeting/networks           — real HR department: field ops, NOC
+#meeting/finance            — the broader division Information Systems sits inside
+#meeting/customer-support    — real HR department: Helpdesk, Accounts
+#meeting/hr
 #meeting/external
 ```
 Both lists live in the `types` and `counterparties` arrays at the top of
@@ -116,31 +126,34 @@ There is no `series` tag — "which recurring meeting" is fully
 covered by the combination of ceremony type + counterparty, with no third
 tag to keep in sync.
 
-**Followup state:**
+**To-do** — a single flat tag, no lifecycle. "Done" is the checkbox itself
+(`- [x]`), not a tag transition:
 ```
-#followup/open        — default on creation
-#followup/delegated    — handed to someone else; who goes in **Owner:**
-#followup/done
+#todo
 ```
 
-**Idea state:**
+**Idea** — a single flat tag, no lifecycle. Ideation is just ideation;
+promoting one to a full note in `Ideas/` is signaled by the link existing,
+not by a tag change:
 ```
-#idea/raw          — default on creation
-#idea/exploring
-#idea/promoted     — has a full note in Ideas/; link it back
-#idea/parked
+#idea
 ```
 
 **Value** — what business outcome a delivered piece of work serves. Not a
 meeting attribute — lives on the Outcome Block, logged when something
-actually ships or a decision lands, not on every meeting. Multi-select: one
-outcome can carry several:
+actually ships or a decision lands. Multi-select: one outcome can carry
+several. Two framings sit side by side in one flat list — commercial
+(revenue-facing) and QCDSM (operational):
 ```
 #value/revenue-protect
 #value/revenue-growth
 #value/revenue-expand
 #value/customer-experience
-#value/cost-reduction
+#value/cost-reduction        — QCDSM: Cost
+#value/quality                — QCDSM: Quality
+#value/delivery                — QCDSM: Delivery
+#value/safety                  — QCDSM: Safety
+#value/morale                  — QCDSM: Morale
 ```
 Add new ones by editing the `values` array at the top of `Outcome Block.md`
 (keep "Done - no more tags" last in the list — that's what ends the
@@ -159,8 +172,8 @@ command, one after another.
 |---|---|
 | `Meeting Block.md` | Prompts for ceremony type, then counterparty; inserts a `[!meeting]` callout with both tags |
 | `Notes Block.md` | Lightweight timestamped bullet, no callout, no meeting header needed |
-| `Idea Block.md` | Inserts a `[!idea]` callout; promote to `Ideas/` later if it develops |
-| `Followup Block.md` | Inserts a `[!followup]` callout with owner/due/checkbox |
+| `Idea Block.md` | Inserts a `[!idea]` callout — pure ideation capture, no state |
+| `To-do Block.md` | Inserts a `[!todo]` callout with owner/due/checkbox — an action item for you to track, done = checking the box |
 | `Outcome Block.md` | Prompts for one or more value tags (loop, pick "Done" to finish), then a description; inserts a `[!outcome]` callout — use when something ships or a decision lands, for demonstrating team value later |
 | `Diagram Block.md` | Prompts for a title, creates a new Excalidraw drawing in `Diagrams/`, embeds it at the cursor |
 | `Photo Block.md` | Caption placeholder — use the mobile toolbar's camera/gallery icon to insert the image below it |
@@ -211,15 +224,15 @@ git push
 ## Daily workflow
 
 1. Open today's daily note — blank except the date heading.
-2. Insert whatever blocks the moment calls for — a meeting, a followup, an
-   idea, a diagram, a photo — in any order, as many times as needed.
+2. Insert whatever blocks the moment calls for — a meeting, a to-do, an
+   idea, an outcome, a diagram, a photo — in any order, as many times as needed.
 3. Promote an idea that has legs into a full note via `Idea Template.md`.
 
 There's no manual linking step for recurring meetings anymore — the
 ceremony type + counterparty tag combination does that automatically.
 Nothing to remember to update after a meeting ends.
 
-## Worked example — one day, three meetings, a followup, an idea
+## Worked example — one day, three meetings, a to-do, an idea, an outcome
 
 ```markdown
 # 2026-08-18, Tuesday
@@ -231,7 +244,7 @@ Nothing to remember to update after a meeting ends.
 > **Notes:**
 > -
 
-> [!followup]+ #followup/open
+> [!todo]+ #todo
 > **Owner:** Thabo
 > **Due:** 2026-08-22
 > - [ ] Confirm churn model retraining cadence
@@ -243,10 +256,10 @@ Nothing to remember to update after a meeting ends.
 > **Notes:**
 > -
 
-> [!idea]+ #idea/raw
+> [!idea]+ #idea
 > - NorthStar could auto-flag stale dashboards
 
-> [!outcome]+ Churn model retrain shipped #value/cost-reduction #value/revenue-protect
+> [!outcome]+ Churn model retrain shipped #value/cost-reduction #value/revenue-protect #value/quality
 > **Linked project:** [[Projects/Churn Model]]
 >
 > **Details:**
@@ -267,10 +280,12 @@ Nothing to remember to update after a meeting ends.
 | `#meeting` | Every meeting, any type, across every day |
 | `#meeting/1-1` | Just your one-on-ones |
 | `#meeting/standup #meeting/bs-dev` | Every BS-Dev standup — type + counterparty combined |
-| `#followup/open` | Every open action item, across every day |
-| `#followup/open "Owner: Thabo"` | Everything open that Thabo owes you |
-| `#idea/raw` | Every idea not yet triaged |
+| `#todo` | Every action item, open or done, across every day |
+| `#todo "Owner: Thabo"` | Everything Thabo owes you, open or done |
+| `#todo "Owner: Thabo" "- [ ]"` | Just what Thabo still has open — add the literal checkbox text to exclude done items |
+| `#idea` | Every idea you've ever captured |
 | `#value/cost-reduction` | Every outcome that reduced cost, across every day — this quarter's whole cost-reduction case built from search alone |
+| `#value/quality` or `#value/safety` or `#value/morale` | QCDSM-framed operational value, independent of the revenue framing |
 
 ## Notes
 

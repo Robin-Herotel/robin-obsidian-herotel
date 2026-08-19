@@ -1,4 +1,4 @@
-> [!followup]+ #followup/open
+> [!todo]+ #todo
 > **Owner:**
 > **Due:**
 > - [ ]
