@@ -44,7 +44,7 @@ and gets found later purely through **tags**. It never gets its own folder
 or its own index note, even if it repeats every week. (This vault used to
 have a `Meetings/` folder with one index note per recurring meeting — that
 broke this rule, since a recurring meeting is an event, not a persistent
-artifact. It's been replaced by the series tag below.)
+artifact. It's been replaced by ceremony-type and counterparty tags below.)
 
 | Folder | Why it survives the rule |
 |---|---|
@@ -57,9 +57,9 @@ artifact. It's been replaced by the series tag below.)
 ## The organizing rule: folders / tags / links each do one job
 
 - **Folders** — broad separation, governed by the rule above. Rarely change.
-- **Tags** — mark **type**, **state**, or **which recurring series** — never
-  topic or person. `#meeting/1-1` says *what kind*; `#meeting/praelexis-standup`
-  says *which recurring series*; `#followup/open` says *what state*. "Who
+- **Tags** — mark **type**, **state**, or **who a meeting's with** — never
+  topic or person. `#meeting/1-1` says *what kind*; `#meeting/bs-dev`
+  says *who it's with*; `#followup/open` says *what state*. "Who
   owns this" is a field (`**Owner:**`), not a tag. "What project is this
   about" is a `[[link]]` to that project's note, not a tag.
 - **Links** — connection and context, used sparingly (e.g. linking a
@@ -74,33 +74,47 @@ embed or a captioned image doesn't need a box around it.
 
 | Callout | Syntax | Contains | Default state |
 |---|---|---|---|
-| `meeting` | `> [!meeting]+ Name #meeting/<type> #meeting/<series>` | Time, Attendees, Notes | Expanded — you're actively in it |
+| `meeting` | `> [!meeting]+ Name #meeting/<type> #meeting/<counterparty>` | Time, Attendees, Notes | Expanded — you're actively in it |
 | `followup` | `> [!followup]+ #followup/open` | Owner, Due, one checkbox task | Expanded while open; collapse once closed |
 | `idea` | `> [!idea]+ #idea/raw` | Free-text bullet(s) | Expanded |
+| `outcome` | `> [!outcome]+ Name #value/<tag> [#value/<tag> ...]` | Linked project, Details | Expanded — for reviewing what shipped |
 
 ## Tag taxonomy
 
-**Meeting type** (parent `#meeting` catches all; narrow with a subtype):
+**Meeting: ceremony type** (the FORMAT of the meeting — nothing about who's
+in it). Parent `#meeting` catches all; narrow with a subtype:
 ```
-#meeting/team                    — internal team / Praelexis catchups
-#meeting/Herotel-stakeholder      — cross-department / internal stakeholder engagement
-#meeting/sprint-planning
 #meeting/standup
-#meeting/1-1                     — one-on-ones
-#meeting/external                — vendor / partner / customer-facing
+#meeting/sprint-planning
+#meeting/retro
+#meeting/1-1
+#meeting/workshop
+#meeting/problem-solving
+#meeting/review
+#meeting/planning
+#meeting/training
+#meeting/steering
+#meeting/general
 ```
-Add new types by editing the `types` array at the top of `Meeting Block.md`.
 
-**Meeting series** — which specific recurring meeting, independent of type.
-A meeting can carry both a type tag and a series tag at once (e.g. Praelexis
-Standup is both `#meeting/team` and `#meeting/praelexis-standup`):
+**Meeting: counterparty** (WHO the meeting is with — nothing about
+format). Independent of ceremony type — a meeting carries both:
 ```
-#meeting/praelexis-standup
+#meeting/general
+#meeting/d-a            — Data & Analytics
+#meeting/sdi
+#meeting/bs-support      — maps to the real HR "Support" function
+#meeting/bs-dev          — maps to the real HR "Systems Development" function
+#meeting/praelexis
+#meeting/external
 ```
-Add new series by editing the `series` array in `Meeting Block.md` — the
-tag is generated automatically from the name you add (lowercased, spaces
-become hyphens), so you never type the tag by hand. Picking "One-off / no
-series" skips the series tag and just asks for a free-text meeting name.
+Both lists live in the `types` and `counterparties` arrays at the top of
+`Meeting Block.md` — add new entries there, the tag is generated
+automatically (lowercased, spaces/`&` become hyphens).
+
+There is no `series` tag — "which recurring meeting" is fully
+covered by the combination of ceremony type + counterparty, with no third
+tag to keep in sync.
 
 **Followup state:**
 ```
@@ -117,6 +131,21 @@ series" skips the series tag and just asks for a free-text meeting name.
 #idea/parked
 ```
 
+**Value** — what business outcome a delivered piece of work serves. Not a
+meeting attribute — lives on the Outcome Block, logged when something
+actually ships or a decision lands, not on every meeting. Multi-select: one
+outcome can carry several:
+```
+#value/revenue-protect
+#value/revenue-growth
+#value/revenue-expand
+#value/customer-experience
+#value/cost-reduction
+```
+Add new ones by editing the `values` array at the top of `Outcome Block.md`
+(keep "Done - no more tags" last in the list — that's what ends the
+multi-select loop).
+
 ## Blocks (insert into the note you're already in)
 
 Cursor where you want it → Command Palette → **"Templater: Open insert
@@ -128,10 +157,11 @@ command, one after another.
 
 | Block | Use for |
 |---|---|
-| `Meeting Block.md` | Prompts for meeting type, then series (or a free-text name for one-offs); inserts a `[!meeting]` callout with both tags |
+| `Meeting Block.md` | Prompts for ceremony type, then counterparty; inserts a `[!meeting]` callout with both tags |
 | `Notes Block.md` | Lightweight timestamped bullet, no callout, no meeting header needed |
 | `Idea Block.md` | Inserts a `[!idea]` callout; promote to `Ideas/` later if it develops |
 | `Followup Block.md` | Inserts a `[!followup]` callout with owner/due/checkbox |
+| `Outcome Block.md` | Prompts for one or more value tags (loop, pick "Done" to finish), then a description; inserts a `[!outcome]` callout — use when something ships or a decision lands, for demonstrating team value later |
 | `Diagram Block.md` | Prompts for a title, creates a new Excalidraw drawing in `Diagrams/`, embeds it at the cursor |
 | `Photo Block.md` | Caption placeholder — use the mobile toolbar's camera/gallery icon to insert the image below it |
 
@@ -185,16 +215,16 @@ git push
    idea, a diagram, a photo — in any order, as many times as needed.
 3. Promote an idea that has legs into a full note via `Idea Template.md`.
 
-There's no manual linking step for recurring meetings anymore — the series
-tag does that automatically. Nothing to remember to update after a meeting
-ends.
+There's no manual linking step for recurring meetings anymore — the
+ceremony type + counterparty tag combination does that automatically.
+Nothing to remember to update after a meeting ends.
 
 ## Worked example — one day, three meetings, a followup, an idea
 
 ```markdown
 # 2026-08-18, Tuesday
 
-> [!meeting]+ Sprint Planning #meeting/sprint-planning
+> [!meeting]+ Sprint Planning #meeting/sprint-planning #meeting/bs-dev
 > **Time:** 09:00
 > **Attendees:**
 >
@@ -206,7 +236,7 @@ ends.
 > **Due:** 2026-08-22
 > - [ ] Confirm churn model retraining cadence
 
-> [!meeting]+ Praelexis Standup #meeting/team #meeting/praelexis-standup
+> [!meeting]+ Praelexis Standup #meeting/standup #meeting/praelexis
 > **Time:** 11:00
 > **Attendees:**
 >
@@ -216,7 +246,13 @@ ends.
 > [!idea]+ #idea/raw
 > - NorthStar could auto-flag stale dashboards
 
-> [!meeting]+ Vendor Check-in — QContact #meeting/external
+> [!outcome]+ Churn model retrain shipped #value/cost-reduction #value/revenue-protect
+> **Linked project:** [[Projects/Churn Model]]
+>
+> **Details:**
+> - Reduced false-positive churn flags by 18%, cut manual review time
+
+> [!meeting]+ Vendor Check-in — QContact #meeting/general #meeting/external
 > **Time:** 15:00
 > **Attendees:**
 >
@@ -230,10 +266,11 @@ ends.
 |---|---|
 | `#meeting` | Every meeting, any type, across every day |
 | `#meeting/1-1` | Just your one-on-ones |
-| `#meeting/praelexis-standup` | Every Praelexis Standup, in order, full context — no index note needed |
+| `#meeting/standup #meeting/bs-dev` | Every BS-Dev standup — type + counterparty combined |
 | `#followup/open` | Every open action item, across every day |
 | `#followup/open "Owner: Thabo"` | Everything open that Thabo owes you |
 | `#idea/raw` | Every idea not yet triaged |
+| `#value/cost-reduction` | Every outcome that reduced cost, across every day — this quarter's whole cost-reduction case built from search alone |
 
 ## Notes
 

@@ -1,26 +1,18 @@
 <%*
-// Meeting type — add new types here as they come up. Keep names matching
-// the README's tag taxonomy exactly (case matters in Obsidian tags).
-const types = ["team", "Herotel-stakeholder", "sprint-planning", "standup", "1-1", "external"];
-const type = await tp.system.suggester(types, types, false, "Meeting type?");
+// Ceremony type — the FORMAT of the meeting, nothing about who's in it.
+// Add new types here as needed.
+const types = ["standup", "sprint-planning", "retro", "1-1", "workshop", "problem-solving", "review", "planning", "training", "steering", "general"];
+const type = await tp.system.suggester(types, types, false, "Ceremony type?");
 
-// Meeting series — add recurring series here as they come up. "One-off"
-// skips the series tag entirely and just asks for a free-text name.
-// The series tag is derived automatically from the name (lowercased,
-// spaces -> hyphens) so you never have to remember exact tag spelling.
-const series = ["Praelexis Standup", "One-off / no series"];
-const chosenSeries = await tp.system.suggester(series, series, false, "Meeting series?");
+// Counterparty — WHO the meeting is with, nothing about format.
+// BS-Support / BS-Dev map to the real HR "Support" / "Systems Development"
+// functions under Business Systems. Add new ones here as needed.
+const counterparties = ["general", "D&A", "SDI", "BS-Support", "BS-Dev", "Praelexis", "external"];
+const counterparty = await tp.system.suggester(counterparties, counterparties, false, "Counterparty?");
 
-let title, seriesTag;
-if (chosenSeries === "One-off / no series") {
-	title = await tp.system.prompt("Meeting name?", "");
-	seriesTag = "";
-} else {
-	title = chosenSeries;
-	seriesTag = " #meeting/" + chosenSeries.toLowerCase().replace(/\s+/g, "-");
-}
+const title = await tp.system.prompt("Meeting name?", "");
 
-tR = `> [!meeting]+ ${title} #meeting/${type}${seriesTag}
+tR = `> [!meeting]+ ${title} #meeting/${type} #meeting/${counterparty.toLowerCase().replace(/[&\s]+/g, "-")}
 > **Time:** ${tp.date.now("HH:mm")}
 > **Attendees:**
 >
