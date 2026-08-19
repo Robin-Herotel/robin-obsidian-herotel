@@ -1,2 +1,4 @@
-**🔁 Follow-up —** <% tp.date.now("HH:mm") %>
-- [ ]
+> [!followup]+ #followup/open
+> **Owner:**
+> **Due:**
+> - [ ]
