@@ -204,22 +204,131 @@ command, one after another.
    - Use Excalidraw folder: **on** → `Diagrams`
    - Template for new drawings: `Templates/Meeting Diagram Template.excalidraw.md`
 
-## Git hygiene — read before syncing across devices
+## Sync process — the rules that prevent downtime
 
-`.gitignore` in this repo excludes:
-- `.obsidian/workspace*.json` — local pane/tab layout, always differs per
-  device; tracking it just causes conflicts with no benefit.
-- `.obsidian/plugins/` — plugin *code*. Reinstall plugins per device via
-  Community Plugins → Browse, don't sync the code through git.
+Git is doing a job it wasn't designed for: syncing a live-edited folder
+across two devices, one of them mobile and sometimes offline. That works,
+but only with discipline. These rules exist because each one maps to a real
+failure that has already happened in this vault.
 
-If a device already has these committed from an earlier backup, run once:
+### What git tracks (and why nothing else)
+
+`.gitignore` excludes everything device-specific, so git only ever touches
+files you deliberately changed:
+- `.obsidian/workspace*.json` — pane/tab layout, always differs per device
+- `.obsidian/plugins/` — plugin *code*; reinstall per device via Community
+  Plugins → Browse
+- `.obsidian/app.json`, `appearance.json`, `community-plugins.json`,
+  `core-plugins.json`, `daily-notes.json` — per-device settings. **These
+  caused a hard sync loop**: Obsidian rewrites them whenever you toggle a
+  plugin, which collided with git's tracked copy on every single clone.
+- `.trash/` — local deleted-notes cache
+
+**Never re-add anything under `.obsidian/` to git.** If a future change
+seems to need it, the answer is a documented setup step in this README
+instead.
+
+### The four rules
+
+1. **Pull before you type. Every session. Both devices.** This is the
+   single highest-value habit — nearly every conflict comes from editing a
+   file that the other device already changed.
+2. **Push before you walk away.** Especially before the tablet goes
+   offline. An unsynced tablet edit is the one scenario that creates a real
+   conflict rather than a clean merge.
+3. **One device per diagram.** Excalidraw files are JSON. Text notes merge
+   cleanly or show readable conflict markers; a half-merged canvas can just
+   fail to render. Finish a drawing and push before touching it elsewhere.
+4. **Daily content goes straight to `main`. Structural changes go through a
+   branch + PR.** See below — the review step has already caught real
+   errors (stale templates, missing files) before they went live.
+
+### Going offline with the tablet
+
+Before losing connection:
+1. Pull (get whatever desktop has)
+2. Work offline freely — commits queue up locally, this is fine
+3. On reconnect: **pull first, then push** — in that order
+
+If step 3 reports a conflict, go to the runbook below. Do not force-push.
+
+### Structural changes (templates, README, tag taxonomy) — desktop only
+
 ```
-git rm -r --cached .obsidian/plugins
-git rm --cached .obsidian/workspace-mobile.json .obsidian/workspace.json 2>/dev/null
-git add .gitignore
-git commit -m "Stop tracking plugin binaries and device-specific workspace state"
-git push
+git checkout main
+git pull
+git checkout -b <short-branch-name>
+# make the change
+git add .
+git commit -m "..."
+git push -u origin <short-branch-name>
 ```
+Then open the PR on GitHub, **read the diff**, merge, delete the branch.
+Back on desktop: `git checkout main && git pull`.
+
+Two traps that have bitten this repo already:
+- **`git checkout -b` fails silently if the branch name already exists**,
+  leaving you on `main` — so your "branch" commit lands on `main` instead.
+  Always confirm with `git status` that you're on the branch you expect
+  before committing.
+- **PowerShell only.** `Expand-Archive` and friends don't exist in Command
+  Prompt; a whole round of "the file didn't change" was cmd.exe silently
+  failing. If the prompt doesn't start with `PS`, you're in the wrong shell.
+
+### Tablet stays on `main`
+
+The tablet never creates branches or opens PRs. It pulls, edits daily
+content, commits, pushes. Mobile git is the least reliable link in this
+chain — give it the simplest possible job.
+
+## Runbook — when sync breaks
+
+Work through these in order. Stop at the first one that resolves it.
+
+**"Nothing happens" / plugin commands missing from the palette**
+→ Settings → Community plugins. Check plugins are toggled **on** (deleting
+`community-plugins.json` switches them all off). Then check Settings → Core
+plugins → Daily notes is on.
+
+**Templater inserts raw `<%* %>` code instead of running it**
+→ You used the wrong command. It must be **"Templater: Open insert template
+modal"**. Obsidian's built-in *Templates* core plugin has a near-identical
+command that doesn't run scripts — if core Templates is enabled, disable it.
+
+**A block creates a new note/tab instead of inserting inline**
+→ Also the wrong command: "Create new note from template" spawns a file.
+Use "Open insert template modal". Also check you didn't type `[[` and pick
+the template from link autocomplete — that just links to the template file.
+
+**"Your local changes would be overwritten by checkout/merge"**
+→ Something local differs from a tracked file. Check *what*:
+`git status`. If it's a file you don't care about, `git checkout -- <file>`
+to discard. If it's under `.obsidian/`, it shouldn't be tracked at all —
+that's a bug in `.gitignore`, fix it rather than deleting the file again.
+
+**Merge conflict in a note**
+→ Open the file. Git leaves `<<<<<<<`, `=======`, `>>>>>>>` markers around
+both versions. Keep what you want, delete the markers, save, commit. For
+daily notes this is usually trivial — keep both halves.
+
+**Merge conflict in an `.excalidraw.md` file**
+→ Don't hand-merge JSON. Pick one side wholesale:
+`git checkout --theirs "<path>"` (remote wins) or `--ours` (local wins),
+then `git add` and commit. Redraw anything lost.
+
+**Tablet is badly stuck and nothing above works — full reset**
+This is safe *only* if the tablet has no unpushed work you care about.
+1. Delete everything in the vault folder **except `.obsidian/`**
+2. Command palette → **Git: Clone an existing remote repo**
+3. URL: `https://github.com/Robin-Herotel/robin-obsidian-herotel.git`
+4. **Vault Root** → **NO** to the `.obsidian` question → leave depth blank
+
+Because nothing under `.obsidian/` is tracked anymore, you no longer need
+to delete config files first, and plugins stay installed and enabled.
+
+**Before any full reset, ask: is there unpushed work here?** If yes and
+you can't push it, copy those specific files out to another folder first.
+A reset discards anything git hasn't seen.
 
 ## Daily workflow
 
