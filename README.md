@@ -186,23 +186,61 @@ command, one after another.
 | `Idea Template.md` | Full write-up once an idea (captured via Idea Block) earns its own note in `Ideas/` |
 | `Meeting Diagram Template.excalidraw.md` | The generic canvas Diagram Block starts new drawings from — not usually invoked directly |
 
-## One-time setup (do this in Obsidian, in order)
+## Per-device setup (repeat on EVERY device, and after any vault reset)
+
+**This is not one-time — it's per-device.** Because `.obsidian/*.json` is
+deliberately untracked (see Sync process), no plugin setting syncs between
+devices. Every device needs these entered by hand once, and again after any
+full reset. Skipping this is what produces symptoms like daily notes
+landing at `Daily/Untitled` instead of `Daily/2026-08-20`.
 
 1. **Open this folder as a vault** in Obsidian.
 2. **Install community plugins**: Settings → Community plugins → Browse →
    - `Templater`
    - `Excalidraw`
-   - (core, not community) **Daily notes** — enable under Settings → Core plugins.
-3. **Configure Daily notes** (Settings → Daily notes):
+   - `Obsidian Git`
+3. **Core plugins** (Settings → Core plugins):
+   - **Daily notes** → **ON**
+   - **Templates** → **OFF**. ⚠️ This is Obsidian's built-in feature, not
+     Templater. It has a near-identical command name but *cannot* run
+     Templater scripts — if enabled, it silently inserts `<%* ... %>` as
+     literal text instead of executing it. Keep it off to remove the
+     ambiguity entirely. See the trap note below.
+4. **Configure Daily notes** (Settings → Daily notes):
    - Date format: `YYYY-MM-DD`
    - New file location: `Daily`
    - Template file location: `Templates/Daily Note Template.md`
-4. **Configure Templater** (Settings → Templater):
+5. **Configure Templater** (Settings → Templater):
    - Template folder location: `Templates`
    - Trigger Templater on new file creation: **on**
-5. **Configure Excalidraw** (Settings → Excalidraw):
+6. **Configure Excalidraw** (Settings → Excalidraw):
    - Use Excalidraw folder: **on** → `Diagrams`
    - Template for new drawings: `Templates/Meeting Diagram Template.excalidraw.md`
+7. **Set commit identity** — same name/email on every device, matching your
+   GitHub account, so history stays attributable:
+   ```
+   git config --global user.name "Robin Lawrence"
+   git config --global user.email "<your GitHub email>"
+   ```
+
+### Trap: "Templates" vs "Templater"
+
+Three commands look interchangeable and are not. Only the first is correct
+for inserting a block:
+
+| Command | What it does |
+|---|---|
+| **Templater: Open insert template modal** | ✅ Runs the script, inserts at cursor — **always use this** |
+| Templater: Create new note from template | Spawns a separate new file/tab instead of inserting inline |
+| Templates: Insert template | Core plugin — pastes raw text, does **not** run scripts |
+
+Also: typing `[[` and picking a template from link autocomplete just
+creates a *link to the template file*. It doesn't insert or run anything.
+
+If a block ever inserts visible `<%*` code, spawns an unexpected new note,
+or does nothing at all — it's almost always the command, not the file.
+Consider setting a hotkey for "Templater: Open insert template modal"
+(Settings → Hotkeys) so there's nothing to mis-tap.
 
 ## Sync process — the rules that prevent downtime
 
@@ -290,10 +328,17 @@ Work through these in order. Stop at the first one that resolves it.
 `community-plugins.json` switches them all off). Then check Settings → Core
 plugins → Daily notes is on.
 
+**Daily note lands at `Daily/Untitled`, or template doesn't fill in**
+→ Per-device settings aren't configured on this device. These never sync
+(by design). Go to **Per-device setup** above and work through steps 3–6.
+Most likely Daily notes has no date format / template path set. Delete the
+stray `Untitled` note afterwards.
+
 **Templater inserts raw `<%* %>` code instead of running it**
 → You used the wrong command. It must be **"Templater: Open insert template
 modal"**. Obsidian's built-in *Templates* core plugin has a near-identical
-command that doesn't run scripts — if core Templates is enabled, disable it.
+command that doesn't run scripts — check Settings → Core plugins and make
+sure **Templates** is **off** (see the trap table in Per-device setup).
 
 **A block creates a new note/tab instead of inserting inline**
 → Also the wrong command: "Create new note from template" spawns a file.
