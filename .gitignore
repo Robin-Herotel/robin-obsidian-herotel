@@ -1,18 +1,6 @@
-# Device-specific UI state — always different per device, causes noisy conflicts
-.obsidian/workspace.json
-.obsidian/workspace-mobile.json
-.obsidian/workspace.json.bak
-
-# Plugin code — reinstalled via Community Plugins on each device, not version-controlled
-.obsidian/plugins/
+# Obsidian config and plugin state � entirely per-device, never synced.
+# Every setting here is documented in README under "Per-device setup".
+.obsidian/
 
 # Obsidian trash/local cache
 .trash/
-
-.obsidian/app.json
-.obsidian/appearance.json
-.obsidian/community-plugins.json
-.obsidian/core-plugins.json
-.obsidian/daily-notes.json
-
-.obsidian/templates.json
