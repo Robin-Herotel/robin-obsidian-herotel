@@ -11,6 +11,8 @@ adding any new folder to this vault.
 ## Folder structure
 
 ```
+Tasks.md          Auto-populating view of every to-do in the vault
+                  (Dataview queries — nothing copied here by hand).
 Daily/            One note per calendar day, created bare from the date template.
 Diagrams/         All Excalidraw drawings live here, one file per diagram.
 Projects/
@@ -199,6 +201,7 @@ landing at `Daily/Untitled` instead of `Daily/2026-08-20`.
    - `Templater`
    - `Excalidraw`
    - `Obsidian Git`
+   - `Dataview` — required for `Tasks.md` to populate
 3. **Core plugins** (Settings → Core plugins):
    - **Daily notes** → **ON**
    - **Templates** → **OFF**. ⚠️ This is Obsidian's built-in feature, not
@@ -377,7 +380,10 @@ A reset discards anything git hasn't seen.
 
 ## Daily workflow
 
-1. Open today's daily note — blank except the date heading.
+1. Open today's daily note — blank except the date heading. Use the
+   calendar ribbon icon or **"Daily notes: Open today's daily note"**.
+   Don't invoke `Daily Note Template` directly — that creates an
+   `Untitled` file instead of a dated one.
 2. Insert whatever blocks the moment calls for — a meeting, a to-do, an
    idea, an outcome, a diagram, a photo — in any order, as many times as needed.
 3. Promote an idea that has legs into a full note via `Idea Template.md`.
@@ -385,6 +391,42 @@ A reset discards anything git hasn't seen.
 There's no manual linking step for recurring meetings anymore — the
 ceremony type + counterparty tag combination does that automatically.
 Nothing to remember to update after a meeting ends.
+
+## Task tracking
+
+`Tasks.md` at vault root is an **auto-populating** view — Dataview queries
+pull every to-do from every note. Nothing is ever copied there by hand;
+that's the point. Requires the **Dataview** community plugin.
+
+**Two ways to capture, both land in Tasks.md:**
+
+Quick — a bare checkbox anywhere, mid-sentence in a meeting's notes if you like:
+```
+- [ ] confirm churn model retraining cadence with Thabo by Friday #todo
+```
+
+Structured — the To-do Block, when a task warrants owner/due fields:
+```
+> [!todo]+ #todo
+> **Owner:** Thabo
+> **Due:** 2026-08-25
+> - [ ] confirm churn model retraining cadence #todo
+```
+
+The `#todo` on the **checkbox line** is what Tasks.md matches on. The
+To-do Block includes it already.
+
+**Marking done:** tick the box (`- [ ]` → `- [x]`), from either Tasks.md or
+the original note — they're the same underlying line. No status tag to
+change.
+
+**Inserting a checkbox without typing it:** the editing-toolbar plugin has
+a checklist button; pressing Enter at the end of a checkbox line
+auto-continues the list; or bind a hotkey to "Toggle checklist status".
+
+**Tasks.md has three views:** Open, Done (last 50), and a safety net
+listing *every* unchecked box vault-wide regardless of tag — so an
+untagged checkbox can't silently go missing.
 
 ## Worked example — one day, three meetings, a to-do, an idea, an outcome
 
