@@ -1,0 +1,6 @@
+﻿# Normalize line endings across devices. Without this, desktop (CRLF) and
+# tablet (LF) disagree on every text file, producing phantom conflicts on
+# files nobody edited - README.md especially.
+* text=auto eol=lf
+*.md text eol=lf
+*.json text eol=lf
